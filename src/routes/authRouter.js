@@ -2,7 +2,8 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
-const jwt=require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 router.post("/register", async function (req, res) {
   try {
@@ -47,10 +48,23 @@ router.post("/login", async function (req, res) {
       });
     }
 
+    const payload = {
+      _id: user._id,
+      username: user.username,
+    };
+
     // generate token
-    jwt.sign(payload, secretOrPrivateKey, [options, callback])
-    
-  } catch (err) {
+    const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, {
+      expiresIn: "1d",
+    });
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      token: "Bearer "+token,
+    });
+  } 
+  
+  catch (err) {
     res
       .status(500)
       .json({ success: false, message: "Server error", error: err.message });
