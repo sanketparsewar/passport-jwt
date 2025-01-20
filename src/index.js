@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const path = require("path");
 const cors = require("cors");
 const authRouter = require("./routes/authRouter");
+const passport = require("passport");
 require("dotenv").config();
 
 const app = express();
@@ -27,6 +28,8 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 app.use("/", authRouter);
+
+app.use(passport.initialize());
 
 app.listen(PORT, (req, res) => {
   console.log(`Server is running on port ${PORT}`);

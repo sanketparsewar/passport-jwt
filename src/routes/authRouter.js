@@ -3,7 +3,11 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
+const passport = require("passport");
 require("dotenv").config();
+
+// middelware
+require("../middleware/authentication");
 
 router.post("/register", async function (req, res) {
   try {
@@ -60,15 +64,24 @@ router.post("/login", async function (req, res) {
     res.status(200).json({
       success: true,
       message: "Login successful",
-      token: "Bearer "+token,
+      token: "Bearer " + token,
     });
-  } 
-  
-  catch (err) {
+  } catch (err) {
     res
       .status(500)
       .json({ success: false, message: "Server error", error: err.message });
   }
+});
+
+// protected route
+router.get("/protected", passport.authenticate("jwt", { session: false }),function(req,res){
+  return res.status(200).json({
+    success: true,
+    user: {
+      id: req.user._id,
+      username: req.user.username,
+    } 
+  });
 });
 
 module.exports = router;
